@@ -38,10 +38,13 @@ void Server::ReadTcp()
     {
         qDebug() << "Hi ontvangen!";
         emit dataReceived(Datacp);
+        WriteTcp("Hallo ik ben de server1\n");
     }
     else
     {
         qDebug() << "Data is: " << Datacp;
+        WriteTcp("Hallo ik ben de server2\n");
+
     }
 //    process = new QProcess();
 //    qDebug() << "Start reading:";
