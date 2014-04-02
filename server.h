@@ -14,7 +14,8 @@
 #include <QStringList>
 #include <QApplication>
 #include <QProcess>
-
+#include <QFile>
+#include <qmath.h>
 #include "mainwindow.h"
 
 class QTcpSocket;
@@ -28,7 +29,8 @@ public:
 private:
     QTcpSocket *tcpSocket;
     QProcess* process;
-
+    bool readRS=false;
+    QString rsCode;
 signals:
     void dataReceived(QByteArray );
     void drawLabel(QString );
@@ -37,6 +39,8 @@ public slots:
     void ReadTcp();
     void WriteTcp(QByteArray );
     void readStdIn();
+    void compileRS();
+    void readStdError();
 };
 
 #endif // SERVER_H

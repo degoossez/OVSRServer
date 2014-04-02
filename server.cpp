@@ -17,6 +17,12 @@ Server::Server(MainWindow * w, QObject *parent) :
 
     connect(server,SIGNAL(newConnection()),this,SLOT(CreateTcp()));
     connect(this,SIGNAL(dataReceived(QByteArray)),w,SLOT(changeUI(QByteArray)));
+
+    process = new QProcess();
+    connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdIn()));
+    //connect(process,SIGNAL(error(QProcess::ProcessError),this,SLOT(slotProcessError(QProcess::ProcessError)));
+    connect(process,SIGNAL(readyReadStandardError()),this,SLOT(readStdError()));
+
 }
 void Server::CreateTcp()
 {
@@ -40,11 +46,69 @@ void Server::ReadTcp()
         emit dataReceived(Datacp);
         WriteTcp("Hallo ik ben de server1\n");
     }
+    else if(Datacp=="STARTPACKAGE\n")
+    {
+        readRS=true;
+        qDebug("Start received");
+    }
+    else if(Datacp=="give bc\n")
+    {
+        qDebug("give bc");
+        QFile file("/home/dries/Desktop/template.bc");
+            if (!file.open(QIODevice::ReadOnly)) return;
+            QByteArray blob = file.readAll();
+            QByteArray temp, outByte,amountOut;
+            float size = blob.size();
+            int i,j = 0;
+            float packetSize = 20;
+
+            int packageAmount =  qCeil(size/packetSize);
+
+            QString temp2 = QString::number(packageAmount);
+            amountOut = temp2.toLocal8Bit();
+            qDebug() << amountOut;
+            WriteTcp(amountOut + "\n");
+            tcpSocket->waitForBytesWritten();
+
+            for(i=0;i<size;i++)
+            {
+
+                for(j=0;j<packetSize;j++)
+                {
+                    temp.append(blob[i]);
+                    if(i == size)
+                        break;
+                    i++;
+                }
+                WriteTcp(temp);
+                outByte.append(temp);
+                temp.clear();
+
+            }
+    }
     else
     {
-        qDebug() << "Data is: " << Datacp;
-        WriteTcp("Hallo ik ben de server2\n");
-
+        if(readRS)
+        {
+            if(Datacp=="ENDPACKAGE\n")
+            {
+                readRS=false;
+                qDebug() << rsCode;
+                qDebug("End received");
+                QFile file("/home/dries/Desktop/template.rs");
+                file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+                QTextStream out(&file);
+                out << rsCode;
+                rsCode.clear();
+                file.close();
+                compileRS();
+            }
+            else
+            {
+                rsCode.append(Datacp);
+            }
+        }
+        else qDebug() << "Data is: " << Datacp;
     }
 //    process = new QProcess();
 //    qDebug() << "Start reading:";
@@ -54,10 +118,27 @@ void Server::ReadTcp()
 }
 void Server::WriteTcp(QByteArray data)
 {
-    qDebug("writing");
     tcpSocket->write(data);
+    tcpSocket->flush();
 }
 void Server::readStdIn()
 {
     qDebug() << process->readAllStandardOutput();
+    WriteTcp("Succesful\n");
+    qDebug("Succesful");
+}
+void Server::readStdError()
+{
+    qDebug() << process->readAllStandardError();
+
+}
+void Server::compileRS()
+{
+
+        qDebug() << "Start reading:";
+        process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api 18 -o /home/dries/Desktop/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
+        //./llvm-rs-cc -target-api 18 -o /home/dries/Desktop/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs
+        qDebug() << "wait to be done";
+        //process->waitForFinished();
+        //qDebug() << "done";
 }
