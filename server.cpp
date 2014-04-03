@@ -3,7 +3,6 @@
 Server::Server(MainWindow * w, QObject *parent) :
     QObject(parent)
 {
-
     server = new QTcpServer(this);
     connect(this,SIGNAL(drawLabel(QString)),w,SLOT(drawLabel(QString)));
     if(!server->listen(QHostAddress::Any,64000))
@@ -20,7 +19,6 @@ Server::Server(MainWindow * w, QObject *parent) :
 
     process = new QProcess();
     connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdIn()));
-    //connect(process,SIGNAL(error(QProcess::ProcessError),this,SLOT(slotProcessError(QProcess::ProcessError)));
     connect(process,SIGNAL(readyReadStandardError()),this,SLOT(readStdError()));
 
 }
@@ -32,8 +30,6 @@ void Server::CreateTcp()
     connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(ReadTcp()));
     qDebug("TCP connection made with a client");
     emit drawLabel("<INFO> TCP connection made with a client");
-
-
 }
 void Server::ReadTcp()
 {
@@ -54,37 +50,8 @@ void Server::ReadTcp()
     else if(Datacp=="give bc\n")
     {
         qDebug("give bc");
-        QFile file("/home/dries/Desktop/template.bc");
-            if (!file.open(QIODevice::ReadOnly)) return;
-            QByteArray blob = file.readAll();
-            QByteArray temp, outByte,amountOut;
-            float size = blob.size();
-            int i,j = 0;
-            float packetSize = 20;
-
-            int packageAmount =  qCeil(size/packetSize);
-
-            QString temp2 = QString::number(packageAmount);
-            amountOut = temp2.toLocal8Bit();
-            qDebug() << amountOut;
-            WriteTcp(amountOut + "\n");
-            tcpSocket->waitForBytesWritten();
-
-            for(i=0;i<size;i++)
-            {
-
-                for(j=0;j<packetSize;j++)
-                {
-                    temp.append(blob[i]);
-                    if(i == size)
-                        break;
-                    i++;
-                }
-                WriteTcp(temp);
-                outByte.append(temp);
-                temp.clear();
-
-            }
+        //file uploaded naar de ftp server
+        WriteTcp("UPLOADED\n");
     }
     else
     {
@@ -110,11 +77,6 @@ void Server::ReadTcp()
         }
         else qDebug() << "Data is: " << Datacp;
     }
-//    process = new QProcess();
-//    qDebug() << "Start reading:";
-//    process->start("./llvm-rs-cc -target-api 18 -o /home/dries/Desktop/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
-//./llvm-rs-cc -target-api 18 -o /home/dries/Desktop/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs
-//    connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdIn()));
 }
 void Server::WriteTcp(QByteArray data)
 {
@@ -129,16 +91,12 @@ void Server::readStdIn()
 }
 void Server::readStdError()
 {
-    qDebug() << process->readAllStandardError();
-
+    WriteTcp(process->readAllStandardError());
+    qDebug()<< "Error message!";
 }
 void Server::compileRS()
 {
-
         qDebug() << "Start reading:";
-        process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api 18 -o /home/dries/Desktop/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
-        //./llvm-rs-cc -target-api 18 -o /home/dries/Desktop/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs
-        qDebug() << "wait to be done";
-        //process->waitForFinished();
-        //qDebug() << "done";
+        process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api 18 -o /home/ftpusers/joe/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
+
 }
