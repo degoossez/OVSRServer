@@ -55,6 +55,7 @@ void Server::ReadTcp()
     }
     else
     {
+        qDebug()<< "DataCP: " + Datacp;
         if(readRS)
         {
             if(Datacp=="ENDPACKAGE\n")
@@ -91,12 +92,13 @@ void Server::readStdIn()
 }
 void Server::readStdError()
 {
-    WriteTcp(process->readAllStandardError());
-    qDebug()<< "Error message!";
+    QByteArray errors =  process->readAllStandardError();
+    WriteTcp(errors + "\n");
+    qDebug()<< "Error message!" + errors;
 }
 void Server::compileRS()
 {
-        qDebug() << "Start reading:";
+        qDebug() << "Compiling";
         process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api 18 -o /home/ftpusers/joe/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
-
+        qDebug() << "Compiling done";
 }
