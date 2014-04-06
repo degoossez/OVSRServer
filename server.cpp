@@ -35,15 +35,17 @@ void Server::ReadTcp()
 {
     //get data from client
     QByteArray Datacp = tcpSocket->readAll();
-
+    static QByteArray apiLevel;
     if(Datacp=="Hi")
     {
-        qDebug() << "Hi ontvangen!";
         emit dataReceived(Datacp);
-        WriteTcp("Hallo ik ben de server1\n");
+        WriteTcp("Hallo ik ben de server\n");
     }
-    else if(Datacp=="STARTPACKAGE\n")
+    else if(Datacp.contains("STARTPACKAGE"))
     {
+        QList<QByteArray> dataList = Datacp.split(' ');
+        qDebug() << "apiLevel = " + dataList[1].trimmed();
+        apiLevel = dataList[1].trimmed();
         readRS=true;
         qDebug("Start received");
     }
@@ -69,7 +71,7 @@ void Server::ReadTcp()
                 out << rsCode;
                 rsCode.clear();
                 file.close();
-                compileRS();
+                compileRS(apiLevel);
             }
             else
             {
@@ -96,9 +98,9 @@ void Server::readStdError()
     WriteTcp(errors + "\n");
     qDebug()<< "Error message!" + errors;
 }
-void Server::compileRS()
+void Server::compileRS(QByteArray apiLevel)
 {
         qDebug() << "Compiling";
-        process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api 18 -o /home/ftpusers/joe/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
+        process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/joe/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
         qDebug() << "Compiling done";
 }

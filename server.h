@@ -39,7 +39,7 @@ public slots:
     void ReadTcp();
     void WriteTcp(QByteArray );
     void readStdIn();
-    void compileRS();
+    void compileRS(QByteArray);
     void readStdError();
 };
 
