@@ -14,7 +14,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    server.cpp
+    server.cpp \
+    sslserver.cpp
 
 HEADERS  += mainwindow.h \
     server.h
