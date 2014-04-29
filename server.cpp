@@ -21,6 +21,8 @@ Server::Server(MainWindow * w, QObject *parent) :
     connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdIn()));
     connect(process,SIGNAL(readyReadStandardError()),this,SLOT(readStdError()));
 
+
+
 }
 void Server::CreateTcp()
 {
@@ -60,12 +62,12 @@ void Server::ReadTcp()
         qDebug()<< "DataCP: " + Datacp;
         if(readRS)
         {
-            if(Datacp=="ENDPACKAGE\n")
+            if(Datacp.contains("ENDPACKAGE\n"))
             {
                 readRS=false;
                 qDebug() << rsCode;
                 qDebug("End received");
-                QFile file("/home/dries/Desktop/template.rs");
+                QFile file("/home/koen/Desktop/template.rs");
                 file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
                 QTextStream out(&file);
                 out << rsCode;
@@ -101,6 +103,8 @@ void Server::readStdError()
 void Server::compileRS(QByteArray apiLevel)
 {
         qDebug() << "Compiling";
-        process->start("/home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/joe/ -p /home/dries/Desktop/ -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/dries/AndroidDev/adt-bundle-linux-x86_64-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/dries/Desktop/template.rs");
+
+        process->start("/home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/joe/ -p /home/koen/Desktop/ -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/koen/Desktop/template.rs");
+
         qDebug() << "Compiling done";
 }
