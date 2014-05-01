@@ -21,6 +21,13 @@ public:
     ~MainWindow();
     QVBoxLayout *VLayout;
     QLabel *Info;
+    QPushButton *openDB;
+    QPushButton *deleteDB;
+    QPushButton *createTabel;
+    QPushButton *createUser;
+    QPushButton *searchUser;
+    QPushButton *showDatabase;
+
 public slots:
     void changeUI(QByteArray );
     void drawLabel(QString );

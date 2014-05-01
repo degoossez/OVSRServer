@@ -4,6 +4,19 @@ Server::Server(MainWindow * w, QObject *parent) :
     QObject(parent)
 {
     server = new QTcpServer(this);
+
+    mw = w;
+    dbManager = new DatabaseManager(this);
+
+    connect(mw->openDB,SIGNAL(clicked()),dbManager,SLOT(openDB()));
+    connect(mw->deleteDB,SIGNAL(clicked()),dbManager, SLOT(deleteDB()));
+    connect(mw->createTabel,SIGNAL(clicked()),dbManager, SLOT( createUsersTable()));
+    connect(mw->createUser, SIGNAL(clicked()),this,SLOT(createUserDialog()));
+    connect(mw->searchUser, SIGNAL(clicked()),this,SLOT(searchUserDialog()));
+    connect(mw->showDatabase,SIGNAL(clicked()),dbManager, SLOT(printDB()));
+
+
+
     connect(this,SIGNAL(drawLabel(QString)),w,SLOT(drawLabel(QString)));
     if(!server->listen(QHostAddress::Any,64000))
     {
@@ -108,3 +121,24 @@ void Server::compileRS(QByteArray apiLevel)
 
         qDebug() << "Compiling done";
 }
+
+void Server::createUserDialog()
+{
+    LoginDialog* loginDialog = new LoginDialog();
+    connect( loginDialog,
+                     SIGNAL(acceptLogin(QString,QString)),
+                     dbManager,
+                     SLOT(insertUser(QString,QString)));
+    loginDialog->exec();
+
+}
+
+void Server::searchUserDialog() {
+    LoginDialog* loginDialog = new LoginDialog();
+    connect( loginDialog,
+                     SIGNAL(acceptLogin(QString,QString)),
+                     dbManager,
+                     SLOT(getUser(QString,QString)));
+    loginDialog->exec();
+}
+

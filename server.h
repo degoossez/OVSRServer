@@ -17,6 +17,8 @@
 #include <QFile>
 #include <qmath.h>
 #include "mainwindow.h"
+#include "databasemanager.h"
+#include "logindialog.h"
 
 class QTcpSocket;
 
@@ -31,6 +33,8 @@ private:
     QProcess* process;
     bool readRS=false;
     QString rsCode;
+    MainWindow *mw;
+    DatabaseManager *dbManager;
 signals:
     void dataReceived(QByteArray );
     void drawLabel(QString );
@@ -41,6 +45,10 @@ public slots:
     void readStdIn();
     void compileRS(QByteArray);
     void readStdError();
+    void createUserDialog();
+    void searchUserDialog();
+
+
 };
 
 #endif // SERVER_H

@@ -11,6 +11,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->setLayout(VLayout);
     VLayout->addWidget(Info);
     Info->setText("Test");
+    openDB = new QPushButton("Open Database");
+    VLayout->addWidget(openDB);
+    deleteDB = new QPushButton("Delete Database");
+    VLayout->addWidget(deleteDB);
+    createTabel = new QPushButton("Create Tabel");
+    VLayout->addWidget(createTabel);
+    createUser = new QPushButton("Create user");
+    VLayout->addWidget(createUser);
+    searchUser = new QPushButton("Search User");
+    VLayout->addWidget(searchUser);
+    showDatabase = new QPushButton("Show database");
+    VLayout->addWidget(showDatabase);
 }
 
 MainWindow::~MainWindow()
