@@ -93,7 +93,7 @@ void LoginDialog::slotAcceptLogin(){
     int     index    = comboUsername->currentIndex();
 
     emit acceptLogin( username,  // current username
-                      password  // current password
+                      password.toUtf8()  // current password
                       );
 
     // close this dialog

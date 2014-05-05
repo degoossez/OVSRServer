@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QSqlQuery>
 #include <QDebug>
+#include <QCryptographicHash>
 
 
 class DatabaseManager : public QObject
@@ -21,8 +22,8 @@ public:
         bool deleteDB();
         QSqlError lastError();
         bool createUsersTable();
-        int insertUser(QString , QString);
-        bool getUser(QString, QString);
+        int insertUser(QString , QByteArray);
+        bool getUser(QString, QByteArray);
         void printDB();
 
     private:

@@ -28,6 +28,9 @@ class Server : public QObject
 public:
     explicit Server(MainWindow *, QObject *parent = 0);
     QTcpServer *server;
+    QString username;
+    QString passwd;
+    bool isValid;   //are user details valid
 private:
     QTcpSocket *tcpSocket;
     QProcess* process;

@@ -86,12 +86,19 @@ bool DatabaseManager::createUsersTable()
     return ret;
 }
 
-int DatabaseManager::insertUser(QString username, QString password)
+int DatabaseManager::insertUser(QString username, QByteArray password)
 {
     int newId = -1;
     bool ret = false;
 
     qDebug() << "inside insertUser " << "username = " + username + " password = " + password;
+
+//    QByteArray hash = QCryptographicHash::hash(password,QCryptographicHash::Md5);
+//    qDebug() << "hash = " + hash + " " + hash.toHex();
+
+    QString hash = QString(QCryptographicHash::hash((password),QCryptographicHash::Md5).toHex());
+    qDebug() << "hash = " + hash;
+
 
     if (db.isOpen())
     {
@@ -99,9 +106,9 @@ int DatabaseManager::insertUser(QString username, QString password)
 
         QSqlQuery query;
         ret = query.exec(QString("insert into user values(NULL,'%1','%2')")
-        .arg(username).arg(password));
+        .arg(username).arg(hash));
 
-        // Get database given autoincrement value
+           // Get database given autoincrement value
         if (ret)
         {
             newId = query.lastInsertId().toInt();
@@ -111,13 +118,13 @@ int DatabaseManager::insertUser(QString username, QString password)
             qDebug() << "error cannot create user : " + query.lastError().text();
 
 
-    }
+       }
 
 
     return newId;
 }
 
-bool DatabaseManager::getUser(QString username, QString password){
+bool DatabaseManager::getUser(QString username, QByteArray password){
     bool ret = false;
 
     //qDebug() << "inside getUser : username = " + username + " passwd = " + password;
@@ -127,13 +134,17 @@ bool DatabaseManager::getUser(QString username, QString password){
     {
         qDebug() << "user " + username + " found";
 
-        if(password == query.value(2).toString())
+        //QString hash = QString(QCryptographicHash::hash((password),QCryptographicHash::Md5).toHex());
+
+        if(QString(password) == query.value(2).toString())
+        {
             qDebug() << "password OK";
+            ret = true;
+        }
         else
             qDebug() << "password error";
 
 
-        ret = true;
     }
     else
         qDebug() << username + " : not found";
@@ -146,7 +157,7 @@ void DatabaseManager::printDB() {
     QSqlQuery query(QString("select * from user"));
     while(query.next())
     {
-        qDebug() << query.value(0).toString() + " " + query.value(1).toString() + " " + query.value(2).toString();
+        qDebug() << query.value(0).toString() + " " + query.value(1).toString() + " " + query.value(2).toByteArray();
 
     }
 

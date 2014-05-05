@@ -85,7 +85,7 @@ class LoginDialog : public QDialog
           * \param password the password entered in the dialog
           * \param index the number of the username selected in the combobox
           */
-        void acceptLogin( QString username, QString password);
+        void acceptLogin( QString username, QByteArray password);
 
     public slots:
         /*!

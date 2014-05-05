@@ -34,7 +34,7 @@ Server::Server(MainWindow * w, QObject *parent) :
     connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readStdIn()));
     connect(process,SIGNAL(readyReadStandardError()),this,SLOT(readStdError()));
 
-
+    dbManager->openDB();
 
 }
 void Server::CreateTcp()
@@ -58,11 +58,32 @@ void Server::ReadTcp()
     }
     else if(Datacp.contains("STARTPACKAGE"))
     {
-        QList<QByteArray> dataList = Datacp.split(' ');
-        qDebug() << "apiLevel = " + dataList[1].trimmed();
-        apiLevel = dataList[1].trimmed();
-        readRS=true;
         qDebug("Start received");
+
+        username = "";
+        passwd = "";
+        isValid = false;
+
+        QList<QByteArray> dataList = Datacp.split(' ');
+        username = dataList[1].trimmed();
+        passwd = dataList[2].trimmed();
+
+        qDebug() << "pass = " + passwd;
+
+        if(dbManager->getUser(username,passwd.toUtf8()))
+        {
+            qDebug() << "apiLevel = " + dataList[3].trimmed();
+            apiLevel = dataList[3].trimmed();
+            readRS=true;
+            isValid = true;
+        }
+        else
+        {
+            WriteTcp("Wrong username or password!\n");
+            readRS=true;
+        }
+
+
     }
     else if(Datacp=="give bc\n")
     {
@@ -72,28 +93,35 @@ void Server::ReadTcp()
     }
     else
     {
-        qDebug()<< "DataCP: " + Datacp;
+        //qDebug()<< "DataCP: " + Datacp;
         if(readRS)
         {
             if(Datacp.contains("ENDPACKAGE\n"))
             {
-                readRS=false;
                 qDebug() << rsCode;
                 qDebug("End received");
-                QFile file("/home/koen/Desktop/template.rs");
-                file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
-                QTextStream out(&file);
-                out << rsCode;
+                readRS=false;
+
+                if(isValid)
+                {
+                    QFile file("/home/ftpusers/" + username + "/template.rs");
+                    if(!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+                        qDebug() << "cannot find file";
+                    QTextStream out(&file);
+                    out << rsCode;
+                    file.close();
+                    compileRS(apiLevel);
+
+                }
                 rsCode.clear();
-                file.close();
-                compileRS(apiLevel);
+
             }
             else
             {
                 rsCode.append(Datacp);
             }
         }
-        else qDebug() << "Data is: " << Datacp;
+        //else qDebug() << "Data is: " << Datacp;
     }
 }
 void Server::WriteTcp(QByteArray data)
@@ -116,8 +144,8 @@ void Server::readStdError()
 void Server::compileRS(QByteArray apiLevel)
 {
         qDebug() << "Compiling";
-
-        process->start("/home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/joe/ -p /home/koen/Desktop/ -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/koen/Desktop/template.rs");
+        qDebug() << "/home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/" + username + " -p /home/ftpusers/" + username + " -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/ftpusers/" + username + "/template.rs";
+        process->start("/home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/" + username + " -p /home/ftpusers/" + username + " -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/ftpusers/" + username + "/template.rs");
 
         qDebug() << "Compiling done";
 }
@@ -126,9 +154,9 @@ void Server::createUserDialog()
 {
     LoginDialog* loginDialog = new LoginDialog();
     connect( loginDialog,
-                     SIGNAL(acceptLogin(QString,QString)),
+                     SIGNAL(acceptLogin(QString,QByteArray)),
                      dbManager,
-                     SLOT(insertUser(QString,QString)));
+                     SLOT(insertUser(QString,QByteArray)));
     loginDialog->exec();
 
 }
@@ -136,9 +164,9 @@ void Server::createUserDialog()
 void Server::searchUserDialog() {
     LoginDialog* loginDialog = new LoginDialog();
     connect( loginDialog,
-                     SIGNAL(acceptLogin(QString,QString)),
+                     SIGNAL(acceptLogin(QString,QByteArray)),
                      dbManager,
-                     SLOT(getUser(QString,QString)));
+                     SLOT(getUser(QString,QByteArray)));
     loginDialog->exec();
 }
 
