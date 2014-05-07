@@ -79,7 +79,7 @@ void Server::ReadTcp()
         }
         else
         {
-            WriteTcp("Wrong username or password!\n");
+            WriteTcp("login error\n");;
             readRS=true;
         }
 
@@ -91,9 +91,36 @@ void Server::ReadTcp()
         //file uploaded naar de ftp server
         WriteTcp("UPLOADED\n");
     }
+    else if(Datacp.contains("LOGIN"))
+    {
+        qDebug() << "inside LOGIN: " + Datacp;
+
+        if(Datacp.contains("ENDLOGIN"))
+        {
+            qDebug() << "user login request";
+            QList<QByteArray> dataList = Datacp.split(' ');
+
+            QString username = dataList[1].trimmed();
+            QString passwd = dataList[2].trimmed();
+
+            if(dbManager->getUser(username,passwd.toUtf8()))
+            {
+                WriteTcp("login ok\n");
+
+            }
+            else
+            {
+                WriteTcp("login error\n");
+            }
+
+
+
+        }
+
+    }
     else
     {
-        //qDebug()<< "DataCP: " + Datacp;
+        qDebug()<< "DataCP: " + Datacp;
         if(readRS)
         {
             if(Datacp.contains("ENDPACKAGE\n"))
