@@ -30,6 +30,7 @@ public:
     QTcpServer *server;
     QString username;
     QString passwd;
+    QString newPass;
     bool isValid;   //are user details valid
 private:
     QTcpSocket *tcpSocket;
@@ -38,6 +39,7 @@ private:
     QString rsCode;
     MainWindow *mw;
     DatabaseManager *dbManager;
+    bool compiling = false;
 signals:
     void dataReceived(QByteArray );
     void drawLabel(QString );

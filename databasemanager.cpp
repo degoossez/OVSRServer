@@ -91,7 +91,7 @@ int DatabaseManager::insertUser(QString username, QByteArray password)
     int newId = -1;
     bool ret = false;
 
-    qDebug() << "inside insertUser " << "username = " + username + " password = " + password;
+    qDebug() << "inside insertUser " << "username = " + username + " password = " + QString(password);
 
 //    QByteArray hash = QCryptographicHash::hash(password,QCryptographicHash::Md5);
 //    qDebug() << "hash = " + hash + " " + hash.toHex();
@@ -151,6 +151,21 @@ bool DatabaseManager::getUser(QString username, QByteArray password){
 
     return ret;
 }
+
+bool DatabaseManager::getUserName(QString username)
+{
+    bool ret = false;
+
+    QSqlQuery query(QString("select * from user where username = '%1'").arg(username));
+    if (query.next())
+    {
+        ret = true;
+    }
+
+    return ret;
+
+}
+
 
 void DatabaseManager::printDB() {
 

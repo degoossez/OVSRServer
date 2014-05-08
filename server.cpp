@@ -101,7 +101,7 @@ void Server::ReadTcp()
             QList<QByteArray> dataList = Datacp.split(' ');
 
             QString username = dataList[1].trimmed();
-            QString passwd = dataList[2].trimmed();
+            QString passwd = dataList[2].trimmed();            
 
             if(dbManager->getUser(username,passwd.toUtf8()))
             {
@@ -117,6 +117,45 @@ void Server::ReadTcp()
 
         }
 
+    }
+    else if(Datacp.contains("ACCOUNT"))
+    {
+        qDebug() << "inside ACCOUNT: " + Datacp;
+
+        if(Datacp.contains("ENDACCOUNT"))
+        {
+            qDebug() << "Account create request";
+
+            QList<QByteArray> dataList = Datacp.split(' ');
+
+            QString username = dataList[1].trimmed();
+            newPass = dataList[2].trimmed();
+
+            //check if username already exists
+            if(dbManager->getUserName(username))
+            {
+                //username is already in use
+                qDebug() << "account already in use";
+                WriteTcp("acount error\n");
+            }
+            else
+            {
+                qDebug() << "create account";
+                qDebug() << "vlak voor " + newPass;
+                //create database entry
+                dbManager->insertUser(username,newPass.toUtf8());
+
+                //create ftp user
+                process->start("mkdir /home/ftpusers/" + username);
+                process->waitForFinished();
+                process->start("pure-pw useradd " + username + "  -u ftpuser -d /home/ftpusers/" + username);
+                process->waitForFinished();
+
+                WriteTcp("acount created\n");
+
+            }
+
+        }
     }
     else
     {
@@ -137,6 +176,7 @@ void Server::ReadTcp()
                     QTextStream out(&file);
                     out << rsCode;
                     file.close();
+                    compiling = true;
                     compileRS(apiLevel);
 
                 }
@@ -158,9 +198,49 @@ void Server::WriteTcp(QByteArray data)
 }
 void Server::readStdIn()
 {
-    qDebug() << process->readAllStandardOutput();
-    WriteTcp("Succesful\n");
-    qDebug("Succesful");
+    QString str = process->readAllStandardOutput();
+    qDebug() << str;
+
+    if(compiling)
+    {
+        WriteTcp("Succesful\n");
+        compiling = false;
+    }
+
+    if(str.contains("Password:"))
+    {
+        QByteArray byteArray;
+        const char *cstr;
+        int written;
+
+        byteArray = newPass.toUtf8();
+        cstr = byteArray.constData();
+
+        qDebug() << "debug 1 " << cstr;
+        if(written = process->write(cstr + '\n') < 0)
+            qDebug() << "error writing process";
+        qDebug() << "bytes written " + QString::number(written);
+    }
+    else if(str.contains("Enter it again"))
+    {
+        QByteArray byteArray;
+        const char *cstr;
+        int written;
+
+        byteArray = newPass.toUtf8();
+        cstr = byteArray.constData();
+
+        qDebug() << "debug 2 " << cstr;
+        if(written = process->write(cstr + '\n') < 0)
+            qDebug() << "error writing process";
+        qDebug() << "bytes written " + QString::number(written);
+    }
+    else
+    {
+        //WriteTcp("Succesful\n");
+        qDebug("Succesful");
+
+    }
 }
 void Server::readStdError()
 {

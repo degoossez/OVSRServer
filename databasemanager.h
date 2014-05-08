@@ -24,6 +24,7 @@ public:
         bool createUsersTable();
         int insertUser(QString , QByteArray);
         bool getUser(QString, QByteArray);
+        bool getUserName(QString );
         void printDB();
 
     private:
