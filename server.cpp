@@ -150,6 +150,8 @@ void Server::ReadTcp()
                 process->waitForFinished();
                 process->start("pure-pw useradd " + username + "  -u ftpuser -d /home/ftpusers/" + username);
                 process->waitForFinished();
+                process->start("pure-pw mkdb");
+                process->waitForFinished();
 
                 WriteTcp("acount created\n");
 
