@@ -217,8 +217,10 @@ void Server::readStdIn()
         cstr = byteArray.constData();
 
         qDebug() << "debug 1 " << cstr;
-        if(written = process->write(cstr + '\n') < 0)
+        if(written = process->write(cstr) < 0)
             qDebug() << "error writing process";
+        process->write("\n");
+        process->waitForBytesWritten();
         qDebug() << "bytes written " + QString::number(written);
     }
     else if(str.contains("Enter it again"))
@@ -231,8 +233,10 @@ void Server::readStdIn()
         cstr = byteArray.constData();
 
         qDebug() << "debug 2 " << cstr;
-        if(written = process->write(cstr + '\n') < 0)
+        if(written = process->write(cstr) < 0)
             qDebug() << "error writing process";
+        process->write("\n");
+        process->waitForBytesWritten();
         qDebug() << "bytes written " + QString::number(written);
     }
     else
