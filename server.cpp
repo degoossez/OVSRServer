@@ -166,9 +166,15 @@ void Server::ReadTcp()
         {
             if(Datacp.contains("ENDPACKAGE\n"))
             {
-                qDebug() << rsCode;
+                qDebug() << "rsCode = " + rsCode;
                 qDebug("End received");
                 readRS=false;
+
+                if(rsCode == "")
+                {
+                    rsCode = Datacp.replace(QByteArray("ENDPACKAGE"), QByteArray(""));
+                    qDebug() << "empty Code : " + rsCode;
+                }
 
                 if(isValid)
                 {

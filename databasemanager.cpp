@@ -1,15 +1,30 @@
 #include "databasemanager.h"
 #include <QDir>
 
-
+ /*! \brief Constructor
+  *
+  * @param parent A pointer to the parent object
+  */
 DatabaseManager::DatabaseManager(QObject *parent) :
     QObject(parent)
 {
 }
+
+/*! \brief Destructor
+
+ */
 DatabaseManager::~DatabaseManager()
 {
 
 }
+
+/*! \brief Opens the SQL database
+ *
+ * Opens the SQL database located in the user's home directory when working in Linux
+ * and in the application's private folder when working on Windows.
+ *
+ * @return true when database is succesfully opened, otherwise returns false
+ */
 
 bool DatabaseManager::openDB()
 {
@@ -36,6 +51,11 @@ bool DatabaseManager::openDB()
     else
         return false;
 }
+/*! \brief returns the last SQL error
+
+ *
+ * @return the last SQL error
+ */
 
 QSqlError DatabaseManager::lastError()
 {
@@ -43,6 +63,14 @@ QSqlError DatabaseManager::lastError()
     // error description by QSqlError::text()
     return db.lastError();
 }
+
+/*! \brief Deletes the SQL database
+ *
+ * Deletes the SQL database located in the user's home directory when working in Linux
+ * and in the application's private folder when working on Windows.
+ *
+ * @return true when database is succesfully deleted, otherwise returns false.
+ */
 
 bool DatabaseManager::deleteDB()
 {
@@ -63,6 +91,15 @@ bool DatabaseManager::deleteDB()
     return QFile::remove("my.db.sqlite");
     #endif
 }
+
+/*! \brief Creates a table for user data storage
+ *
+ * Creates a table in the currently opened database for the storage of user Data.
+ * The table has 3 fields: ID username password.
+ * This can fail when no database is opened or if the table already exists.
+ *
+ * @return true when table is succesfully created, otherwise returns false.
+ */
 
 bool DatabaseManager::createUsersTable()
 {
@@ -85,6 +122,16 @@ bool DatabaseManager::createUsersTable()
         qDebug() << "table not created";
     return ret;
 }
+
+/*! \brief inserts a new user into the dabase
+ *
+ * Inserts a new user into the database. This can fail when no database is opened or when
+ * the user table is not present.
+ * @param username name of the user.
+ * @param password password of the user.
+ *
+ * @return ID this is the ID of the new entry.
+ */
 
 int DatabaseManager::insertUser(QString username, QByteArray password)
 {
@@ -124,6 +171,16 @@ int DatabaseManager::insertUser(QString username, QByteArray password)
     return newId;
 }
 
+/*! \brief Search a user in the database.
+ *
+ * Looks up a user in the database. Both username and password must be found.
+ * A database must be opened.
+ * @param username name of the user.
+ * @param password password of the user.
+ *
+ * @return true if user is found, otherwise false.
+ */
+
 bool DatabaseManager::getUser(QString username, QByteArray password){
     bool ret = false;
 
@@ -152,6 +209,14 @@ bool DatabaseManager::getUser(QString username, QByteArray password){
     return ret;
 }
 
+/*! \brief Search a user in the database.
+ *
+ * Looks up a user in the database. Only the username is used to locate the user.
+ * A database must be opened.
+ * @param username name of the user.
+ *
+ * @return true if user is found, otherwise false.
+ */
 bool DatabaseManager::getUserName(QString username)
 {
     bool ret = false;
@@ -166,6 +231,12 @@ bool DatabaseManager::getUserName(QString username)
 
 }
 
+/*! \brief Prints the content of the user table in the database
+ *
+ * All entries in the user table of the opened database will be displayed in the debug window.
+ * This can fail when no database is opened or present. The user table must exist with at least one entry.
+ *
+ */
 
 void DatabaseManager::printDB() {
 
