@@ -1,5 +1,11 @@
 #include "server.h"
 
+
+/*! \brief Constructor
+ *
+ * @param w A pointer used to acces the widgets on the main window
+ * @param parent A pointer to the parent object
+ */
 Server::Server(MainWindow * w, QObject *parent) :
     QObject(parent)
 {
@@ -37,6 +43,14 @@ Server::Server(MainWindow * w, QObject *parent) :
     dbManager->openDB();
 
 }
+
+/*! \brief initialisaton for TCP communication
+ *
+ * Creates the neccessary objects and signal slot connections for TCP communication.
+ * When a user connection is made to the server, a notification is shown on the main window.
+ * @return the last SQL error
+ */
+
 void Server::CreateTcp()
 {
     //MainWindow w;
@@ -46,6 +60,26 @@ void Server::CreateTcp()
     qDebug("TCP connection made with a client");
     emit drawLabel("<INFO> TCP connection made with a client");
 }
+
+/*! \brief read incoming TCP packets
+ *
+ * Read incoming data from the TCP socket. This function will act depending on the received data:
+ *
+ * STARTPACKAGE: indicates the start of a package containing user credentials, API level and Renderscript
+ * code. The username with hashed password will be searched in the SQL database. When this information is
+ * incorrect a login error is send to the client.
+ *
+ * ENDPACKAGE: if the user is correctly authenticated, the Renderscript code, which is completely received(indicated by the
+ * endpackage), will be compiled to bytecode.
+ *
+ * LOGIN: a user login request is received.Search the user in the SQL database. Respond to the client accordingly with
+ * login ok or login error.
+ *
+ * ACCOUNT: the user wants to create an account. First check if username is already in use. If not, create a new entry in the
+ * database. Next the user is created in the FTP user list.
+ *
+ *
+ */
 void Server::ReadTcp()
 {
     //get data from client
@@ -199,6 +233,11 @@ void Server::ReadTcp()
         //else qDebug() << "Data is: " << Datacp;
     }
 }
+
+/*! \brief send TCP message
+ *
+ * @param data The message
+ */
 void Server::WriteTcp(QByteArray data)
 {
     tcpSocket->write(data);

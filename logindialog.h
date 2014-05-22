@@ -52,30 +52,7 @@ class LoginDialog : public QDialog
         void setUpGUI();
 
     public:
-        explicit LoginDialog(QWidget *parent = 0);
-
-        /*!
-          * Sets the proposed username, that can come for instance
-          * from a shared setting.
-          *\param username the string that represents the current username
-          * to display
-          */
-        void setUsername( QString& username );
-
-        /*!
-          * Sets the current password to propose to the user for the login.
-          * \param password the password to fill into the dialog form
-          */
-        void setPassword( QString& password );
-
-        /*!
-          * Sets a list of allowed usernames from which the user
-          * can pick one if he does not want to directly edit it.
-          *\param usernames a list of usernames
-          */
-        void setUsernamesList( const QStringList& usernames );
-
-
+        explicit LoginDialog(QWidget *parent = 0);        
 
     signals:
 
@@ -83,14 +60,12 @@ class LoginDialog : public QDialog
           * A signal emitted when the login is performed.
           * \param username the username entered in the dialog
           * \param password the password entered in the dialog
-          * \param index the number of the username selected in the combobox
+          *
           */
         void acceptLogin( QString username, QByteArray password);
 
     public slots:
-        /*!
-          * A lot to adjust the emitting of the signal.
-          */
+
         void slotAcceptLogin();
 
 };

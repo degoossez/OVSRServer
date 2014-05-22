@@ -1,5 +1,10 @@
 #include "logindialog.h"
 
+
+/*! \brief Constructor
+ *
+ * @param parent A pointer to the parent object
+ */
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent)
 {
@@ -8,6 +13,9 @@ LoginDialog::LoginDialog(QWidget *parent) :
     setModal( true );
 }
 
+/*! \brief setup the GUI for a Login Dialog.
+ *
+ */
 void LoginDialog::setUpGUI(){
     // set up the layout
     QGridLayout* formGridLayout = new QGridLayout( this );
@@ -61,31 +69,8 @@ void LoginDialog::setUpGUI(){
 
 }
 
-
-void LoginDialog::setUsername(QString &username){
-    bool found = false;
-    for( int i = 0; i < comboUsername->count() && ! found ; i++ )
-        if( comboUsername->itemText( i ) == username  ){
-            comboUsername->setCurrentIndex( i );
-            found = true;
-        }
-
-    if( ! found ){
-        int index = comboUsername->count();
-        qDebug() << "Select username " << index;
-        comboUsername->addItem( username );
-
-        comboUsername->setCurrentIndex( index );
-    }
-
-    // place the focus on the password field
-    editPassword->setFocus();
-}
-
-
-void LoginDialog::setPassword(QString &password){
-    editPassword->setText( password );
-}
+/*! \brief A slot to adjust the emitting of the signal
+ */
 
 void LoginDialog::slotAcceptLogin(){
     QString username = comboUsername->currentText();
@@ -101,6 +86,3 @@ void LoginDialog::slotAcceptLogin(){
 }
 
 
-void LoginDialog::setUsernamesList(const QStringList &usernames){
-    comboUsername->addItems( usernames );
-}
