@@ -243,6 +243,18 @@ void Server::WriteTcp(QByteArray data)
     tcpSocket->write(data);
     tcpSocket->flush();
 }
+
+/*! \brief reads the standard input from QProcess
+ *
+ * This function reads the standard input from a QProcess, and act accordingly.
+ *
+ * When QProcess has been used for compiling the Renderscript Code (if the variable compiling is true)
+ * we know that there were no compile errors and a TCP message will be send to indicate this.
+ *
+ * When QProcess has been used to create a FTP user, the first time this function is called the password is written
+ * to the Process. The second time this action will be repeated to confirm the password.
+ *
+ */
 void Server::readStdIn()
 {
     QString str = process->readAllStandardOutput();
@@ -293,12 +305,26 @@ void Server::readStdIn()
 
     }
 }
+
+/*! \brief reads the standard error from QProcess
+ *
+ * This function reads the standard error from a QProcess.
+ * The error message, which contains the compiler errors, is send via TCP to the client
+ *
+ */
 void Server::readStdError()
 {
     QByteArray errors =  process->readAllStandardError();
     WriteTcp(errors + "\n");
     qDebug()<< "Error message!" + errors;
 }
+
+/*! \brief compiles the RenderScript code
+ *
+ * calls the RenderScript compiler, the output folder depends on the username of the client.
+ *
+ * @param apiLevel the API level is used to build the right bytecode that can run on the client's device
+ */
 void Server::compileRS(QByteArray apiLevel)
 {
         qDebug() << "Compiling";
@@ -307,6 +333,11 @@ void Server::compileRS(QByteArray apiLevel)
 
         qDebug() << "Compiling done";
 }
+
+/*! \brief shows a dialog to create a user directly on the server
+ *
+ *
+ **/
 
 void Server::createUserDialog()
 {
@@ -319,6 +350,10 @@ void Server::createUserDialog()
 
 }
 
+/*! \brief shows a dialog to search for a user
+ *
+ *
+ **/
 void Server::searchUserDialog() {
     LoginDialog* loginDialog = new LoginDialog();
     connect( loginDialog,
