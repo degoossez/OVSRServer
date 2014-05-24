@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 #include "databasemanager.h"
 #include "logindialog.h"
+#include "settings.h"
 
 class QTcpSocket;
 

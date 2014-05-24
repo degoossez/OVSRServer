@@ -24,13 +24,13 @@ Server::Server(MainWindow * w, QObject *parent) :
 
 
     connect(this,SIGNAL(drawLabel(QString)),w,SLOT(drawLabel(QString)));
-    if(!server->listen(QHostAddress::Any,64000))
+    if(!server->listen(QHostAddress::Any,PORT))
     {
-        emit drawLabel("<ERROR> Server is unable to listen on port 64000!\n");
+        emit drawLabel("<ERROR> Server is unable to listen on port " + QString::number(PORT) + "!\n");
     }
     else
     {
-        emit drawLabel("<INFO> Server started on port 64000.\n <INFO> Waiting for client.");
+        emit drawLabel("<INFO> Server started on port " + QString::number(PORT) + ".\n <INFO> Waiting for client.");
     }
 
     connect(server,SIGNAL(newConnection()),this,SLOT(CreateTcp()));
@@ -180,9 +180,9 @@ void Server::ReadTcp()
                 dbManager->insertUser(username,newPass.toUtf8());
 
                 //create ftp user
-                process->start("mkdir /home/ftpusers/" + username);
+                process->start("mkdir "FTP_USERS_DIR + username);
                 process->waitForFinished();
-                process->start("pure-pw useradd " + username + "  -u ftpuser -d /home/ftpusers/" + username);
+                process->start("pure-pw useradd " + username + "  -u "FTP_GROUP" -d "FTP_USERS_DIR + username);
                 process->waitForFinished();
                 process->start("pure-pw mkdb");
                 process->waitForFinished();
@@ -212,7 +212,7 @@ void Server::ReadTcp()
 
                 if(isValid)
                 {
-                    QFile file("/home/ftpusers/" + username + "/template.rs");
+                    QFile file(FTP_USERS_DIR + username + "/template.rs");
                     if(!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
                         qDebug() << "cannot find file";
                     QTextStream out(&file);
@@ -328,8 +328,8 @@ void Server::readStdError()
 void Server::compileRS(QByteArray apiLevel)
 {
         qDebug() << "Compiling";
-        qDebug() << "/home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/" + username + " -p /home/ftpusers/" + username + " -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/ftpusers/" + username + "/template.rs";
-        process->start("/home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/19.0.3/llvm-rs-cc -target-api " + apiLevel + " -o /home/ftpusers/" + username + " -p /home/ftpusers/" + username + " -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/include -I /home/koen/Eindwerk-Eclipse/adt-bundle-linux-x86-20131030/sdk/build-tools/android-4.4/renderscript/clang-include /home/ftpusers/" + username + "/template.rs");
+        qDebug() << SDK_PATH"/build-tools/"BUILD_TOOLS_VERSION"/llvm-rs-cc -target-api " + apiLevel + " -o "FTP_USERS_DIR + username + " -p "FTP_USERS_DIR + username + " -I "SDK_PATH"/build-tools/"BUILD_TOOLS_VERSION"/renderscript/include -I "SDK_PATH"/build-tools/"BUILD_TOOLS_VERSION"/renderscript/clang-include "FTP_USERS_DIR + username + "/template.rs";
+        process->start(SDK_PATH"/build-tools/"BUILD_TOOLS_VERSION"/llvm-rs-cc -target-api " + apiLevel + " -o "FTP_USERS_DIR + username + " -p "FTP_USERS_DIR + username + " -I "SDK_PATH"/build-tools/"BUILD_TOOLS_VERSION"/renderscript/include -I "SDK_PATH"/build-tools/"BUILD_TOOLS_VERSION"/renderscript/clang-include "FTP_USERS_DIR + username + "/template.rs");
 
         qDebug() << "Compiling done";
 }

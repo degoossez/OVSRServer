@@ -21,6 +21,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     server.h \
     databasemanager.h \
-    logindialog.h
+    logindialog.h \
+    settings.h
 
 FORMS    += mainwindow.ui
