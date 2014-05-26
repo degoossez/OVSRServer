@@ -13,7 +13,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     setModal( true );
 }
 
-/*! \brief setup the GUI for a Login Dialog.
+/*! \brief Setup the GUI for a Login Dialog.
  *
  */
 void LoginDialog::setUpGUI(){

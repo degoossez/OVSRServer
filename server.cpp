@@ -44,7 +44,7 @@ Server::Server(MainWindow * w, QObject *parent) :
 
 }
 
-/*! \brief initialisaton for TCP communication
+/*! \brief Initialisaton for TCP communication
  *
  * Creates the neccessary objects and signal slot connections for TCP communication.
  * When a user connection is made to the server, a notification is shown on the main window.
@@ -61,7 +61,7 @@ void Server::CreateTcp()
     emit drawLabel("<INFO> TCP connection made with a client");
 }
 
-/*! \brief read incoming TCP packets
+/*! \brief Read incoming TCP packets
  *
  * Read incoming data from the TCP socket. This function will act depending on the received data:
  *
@@ -244,7 +244,7 @@ void Server::WriteTcp(QByteArray data)
     tcpSocket->flush();
 }
 
-/*! \brief reads the standard input from QProcess
+/*! \brief Reads the standard input from QProcess
  *
  * This function reads the standard input from a QProcess, and act accordingly.
  *
@@ -306,7 +306,7 @@ void Server::readStdIn()
     }
 }
 
-/*! \brief reads the standard error from QProcess
+/*! \brief Reads the standard error from QProcess
  *
  * This function reads the standard error from a QProcess.
  * The error message, which contains the compiler errors, is send via TCP to the client
@@ -319,9 +319,9 @@ void Server::readStdError()
     qDebug()<< "Error message!" + errors;
 }
 
-/*! \brief compiles the RenderScript code
+/*! \brief Compiles the RenderScript code
  *
- * calls the RenderScript compiler, the output folder depends on the username of the client.
+ * Calls the RenderScript compiler, the output folder depends on the username of the client.
  *
  * @param apiLevel the API level is used to build the right bytecode that can run on the client's device
  */
@@ -334,8 +334,7 @@ void Server::compileRS(QByteArray apiLevel)
         qDebug() << "Compiling done";
 }
 
-/*! \brief shows a dialog to create a user directly on the server
- *
+/*! \brief Shows a dialog to create a user directly on the server
  *
  **/
 
@@ -350,8 +349,7 @@ void Server::createUserDialog()
 
 }
 
-/*! \brief shows a dialog to search for a user
- *
+/*! \brief Shows a dialog to search for a user
  *
  **/
 void Server::searchUserDialog() {

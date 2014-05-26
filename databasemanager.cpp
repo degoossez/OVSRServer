@@ -51,7 +51,7 @@ bool DatabaseManager::openDB()
     else
         return false;
 }
-/*! \brief returns the last SQL error
+/*! \brief Returns the last SQL error
 
  *
  * @return the last SQL error
@@ -123,7 +123,7 @@ bool DatabaseManager::createUsersTable()
     return ret;
 }
 
-/*! \brief inserts a new user into the dabase
+/*! \brief Inserts a new user into the dabase
  *
  * Inserts a new user into the database. This can fail when no database is opened or when
  * the user table is not present.
