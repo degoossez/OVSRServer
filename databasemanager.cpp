@@ -143,7 +143,8 @@ int DatabaseManager::insertUser(QString username, QByteArray password)
 //    QByteArray hash = QCryptographicHash::hash(password,QCryptographicHash::Md5);
 //    qDebug() << "hash = " + hash + " " + hash.toHex();
 
-    QString hash = QString(QCryptographicHash::hash((password),QCryptographicHash::Md5).toHex());
+    //QString hash = QString(QCryptographicHash::hash((password),QCryptographicHash::Md5).toHex());
+    QString hash = password;
     qDebug() << "hash = " + hash;
 
 
