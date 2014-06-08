@@ -146,11 +146,7 @@ void Server::ReadTcp()
             {
                 WriteTcp("login error\n");
             }
-
-
-
         }
-
     }
     else if(Datacp.contains("ACCOUNT"))
     {
